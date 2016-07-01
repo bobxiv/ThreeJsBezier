@@ -42,16 +42,31 @@
 			geometry.vertices.push(new THREE.Vector3(0, 10, 0));
 			geometry.vertices.push(new THREE.Vector3(10, 0, 0));
 			
-			// creamos la linea
-			//var line = new THREE.Line(geometry, material);
-			//scene.add(line);
-			
 			var curva = new Bezier(scene);
 			curva.pushPuntoControl(new THREE.Vector3(-10, 0,0));
 			curva.pushPuntoControl(new THREE.Vector3(  0,10,0));
 			curva.pushPuntoControl(new THREE.Vector3( 10, 0,0));
 			
-			var onClick = function(event) {
+			//renderer.domElement.onclick = onClick;
+			renderer.domElement.addEventListener('click',onClick,false);
+			document.addEventListener('keydown',onkeydown,false);
+			
+			render();
+			
+			// callback de renderizado
+			function render() 
+			{
+				
+				requestAnimationFrame(render);
+				curva.dibujarPuntosControl();
+				curva.dibujar(50);
+				//curva.printPC();
+				renderer.render(scene, camera);
+			}
+			
+			// callback de click	
+			function onClick(event) 
+			{
 				//console.log("click");
 				
 				var vector = new THREE.Vector3();
@@ -67,34 +82,18 @@
 				
 				if( p == null )
 					curva.pushPuntoControl(vector);
-				};
-				
-			var onkeydown = function(event) {
+			}
+			
+			// callback de teclado
+			function onkeydown(event)
+			{
 				//console.log("onkeydown");
 				var key = event.keyCode || event.charCode;
 				//console.log(event.keyCode);
 				
 				if( key == 46 )
 					curva.popPuntoControl();
-				};
-			
-			//renderer.domElement.onclick = onClick;
-			document.addEventListener('click',onClick,false);
-			document.addEventListener('keydown',onkeydown,false);
-			
-			// callback de renderizado
-			var render = function() {
-				
-				requestAnimationFrame(render);
-				curva.dibujarPuntosControl();
-				curva.dibujar(50);
-				//curva.printPC();
-				renderer.render(scene, camera);
-				};
-			
-			
-			
-			render();
+			}
 			};
    </script>
 </body>
