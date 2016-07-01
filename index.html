@@ -9,61 +9,94 @@
    <script src="Bezier.js"></script>
    <script>
 		window.onload = function() {
-  var scene = new THREE.Scene(); // creamos la escena
-  // creamos la camara
-  var ratio = window.innerWidth / window.innerHeight;
-  var sceneHalfHeight = 50;
-  var camera = new THREE.OrthographicCamera(
-    -ratio*sceneHalfHeight, // Left
-    ratio*sceneHalfHeight, // Right
-    -sceneHalfHeight, // Bottom
-    sceneHalfHeight, // Top
-    0.1, // near clipping plane
-    1000 // far clipping plane
-  );
-  camera.position.set(0, 0, 100);
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
-  // creamos el renderer
-  var renderer = new THREE.WebGLRenderer({
-    alpha: true, // transparent background
-    antialias: true // smooth edges
-  });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement); // agregamos el renderer al DOM
-
-  // creamos el material
-  var material = new THREE.LineBasicMaterial({
-    color: 0x0000ff
-  });
-  
-  // creamos la geometria
-  var geometry = new THREE.Geometry();
-  geometry.vertices.push(new THREE.Vector3(-10, 0, 0));
-  geometry.vertices.push(new THREE.Vector3(0, 10, 0));
-  geometry.vertices.push(new THREE.Vector3(10, 0, 0));
-  
-  // creamos la linea
-  //var line = new THREE.Line(geometry, material);
-  //scene.add(line);
-  
-  var curva = new Bezier(scene);
-  curva.agregarPuntoControl(new THREE.Vector3(-10, 0,0));
-  curva.agregarPuntoControl(new THREE.Vector3(  0,10,0));
-  curva.agregarPuntoControl(new THREE.Vector3( 10, 0,0));
-
-  // callback de renderizado
-  var render = function() {
-    requestAnimationFrame(render);
-    //curva.dibujarPuntosControl();
-    console.log(curva.evaluar(0));
-	console.log(curva.evaluar(0.5));
-	console.log(curva.evaluar(1));
-    curva.dibujar(10);
-    renderer.render(scene, camera);
-  };
-
-  render();
-};
+			var scene = new THREE.Scene(); // creamos la escena
+			// creamos la camara
+			var ratio = window.innerWidth / window.innerHeight;
+			var sceneHalfHeight = 50;
+			var camera = new THREE.OrthographicCamera(
+				-ratio*sceneHalfHeight, // Left
+				ratio*sceneHalfHeight, // Right
+				-sceneHalfHeight, // Bottom
+				sceneHalfHeight, // Top
+				0.1, // near clipping plane
+				1000 // far clipping plane
+				);
+			camera.position.set(0, 0, 100);
+			camera.lookAt(new THREE.Vector3(0, 0, 0));
+			// creamos el renderer
+			var renderer = new THREE.WebGLRenderer({
+				alpha: true, // transparent background
+				antialias: true // smooth edges
+				});
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement); // agregamos el renderer al DOM
+			
+			// creamos el material
+			var material = new THREE.LineBasicMaterial({
+				color: 0x0000ff
+			});
+			
+			// creamos la geometria
+			var geometry = new THREE.Geometry();
+			geometry.vertices.push(new THREE.Vector3(-10, 0, 0));
+			geometry.vertices.push(new THREE.Vector3(0, 10, 0));
+			geometry.vertices.push(new THREE.Vector3(10, 0, 0));
+			
+			// creamos la linea
+			//var line = new THREE.Line(geometry, material);
+			//scene.add(line);
+			
+			var curva = new Bezier(scene);
+			curva.pushPuntoControl(new THREE.Vector3(-10, 0,0));
+			curva.pushPuntoControl(new THREE.Vector3(  0,10,0));
+			curva.pushPuntoControl(new THREE.Vector3( 10, 0,0));
+			
+			var onClick = function(event) {
+				//console.log("click");
+				console.log("dsdasd");
+				
+				var vector = new THREE.Vector3();
+				vector.set(
+					  ( event.clientX / window.innerWidth ) * 2 - 1,
+					- ( event.clientY / window.innerHeight ) * 2 + 1,
+					0.5 );
+				vector.unproject( camera );
+				//console.log(vector);
+				vector.z = 0;
+				
+				var p = curva.getPuntoControlCercano(vector, 1.0);
+				
+				if( p == null )
+					curva.pushPuntoControl(vector);
+				};
+				
+			var onkeydown = function(event) {
+				console.log("dsdasd");
+				var key = event.keyCode || event.charCode;
+				console.log(event.keyCode);
+				
+				if( key == 46 )
+					curva.popPuntoControl();
+				};
+			
+			//renderer.domElement.onclick = onClick;
+			document.addEventListener('click',onClick,false);
+			document.addEventListener('keydown',onkeydown,false);
+			
+			// callback de renderizado
+			var render = function() {
+				
+				requestAnimationFrame(render);
+				curva.dibujarPuntosControl();
+				curva.dibujar(50);
+				//curva.printPC();
+				renderer.render(scene, camera);
+				};
+			
+			
+			
+			render();
+			};
    </script>
 </body>
 </html>
